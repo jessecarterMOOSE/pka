@@ -1,0 +1,55 @@
+# bulk Cu lattice
+
+variable	Nx index 10
+
+units		metal
+atom_style	atomic
+atom_modify	map yes  # for compute voronoi
+
+lattice		bcc 2.855312
+region		box block -${Nx} ${Nx} -${Nx} ${Nx} -${Nx} ${Nx}
+create_box	1 box
+create_atoms	1 box
+
+pair_style	eam/fs
+pair_coeff	* * Fe_2.eam.fs Fe
+
+fix		box_relax all box/relax iso 0.0
+minimize	1.0e-10 1.0e-10 1000 1000
+unfix		box_relax
+
+reset_timestep	0
+
+velocity	all create 600.0 376847 loop geom dist gaussian
+
+thermo		100
+thermo_style	custom step temp press
+
+print		"*** velocity initialization ***"
+fix		fix_nve all nve
+run             2000
+unfix		fix_nve
+
+print		"*** NPT equilibration ***"
+fix		fix_npt all npt temp 300.0 300.0 $(100.0*dt) iso 0.0 0.0 $(100.0*dt) drag 1.0
+run		2000
+unfix		fix_npt
+
+print		"*** more NVE equilibration ***"
+fix		fix_nve all nve
+run             2000
+unfix		fix_nve
+
+variable	shell_width equal 5.0
+variable	outer_radius equal xhi
+variable	inner_radius equal xhi-${shell_width}
+
+region		big_sphere sphere 0.0 0.0 0.0 ${outer_radius} side in units box
+region		little_sphere sphere 0.0 0.0 0.0 ${inner_radius} side out units box
+region		shell_region intersect 2 big_sphere little_sphere
+
+group		shell_group region shell_region
+
+write_dump	shell_group custom dump/dump.shell.txt id type x y z
+variable	restart_filename index restart.equilibrate-${Nx}
+write_restart	restart/${restart_filename}

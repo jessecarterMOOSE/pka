@@ -1,0 +1,30 @@
+read_restart	restart/restart.equilibrate-20
+
+pair_style	eam/fs
+pair_coeff	* * Fe_2.eam.fs Fe
+reset_timestep	0
+
+compute		defects all voronoi/atom occupation
+compute		ke all ke/atom
+compute		max_ke all reduce max c_ke
+variable	vac_sites atom c_defects[1]==0
+compute		num_vacs all reduce sum v_vac_sites
+
+fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
+fix		fix_nve all nve
+
+thermo		100
+thermo_style	custom step time dt temp press c_max_ke c_num_vacs
+
+dump		bigdump all custom 100 dump/dumpall.*.txt id x y z c_defects[1] c_defects[2] c_ke
+dump_modify	bigdump pad 6
+
+# pka
+variable	pka_id index 1
+variable	vx index 1.0
+variable	vy index 1.0
+variable	vz index 1.0
+group		pka id ${pka_id}
+velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
+
+run 10000
