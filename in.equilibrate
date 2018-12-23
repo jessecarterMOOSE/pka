@@ -20,7 +20,7 @@ unfix		box_relax
 
 reset_timestep	0
 
-velocity	all create 600.0 376847 loop geom dist gaussian
+velocity	all create 600.0 376847 dist gaussian
 
 thermo		100
 thermo_style	custom step temp press
@@ -50,6 +50,6 @@ region		shell_region intersect 2 big_sphere little_sphere
 
 group		shell_group region shell_region
 
-write_dump	shell_group custom dump/dump.shell.txt id type x y z
+write_dump	shell_group custom dump/dump.shell-${Nx}.txt id type x y z
 variable	restart_filename index restart.equilibrate-${Nx}
 write_restart	restart/${restart_filename}
