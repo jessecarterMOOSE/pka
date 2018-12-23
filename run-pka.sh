@@ -4,13 +4,12 @@
 
 # set some simple parameters
 export pka_energy=1000.0  # pka energy in eV
-export pka_mass=55.845  # pka mass in amu
 
 # LAMMPS dump file containing atoms to be selected to be a PKA
 export atom_file="dump/dump.shell-10.txt"
 
 # select atom from file and velocity vector that points at the simulation box origin
-data_array=(`python -c "import os; import lammps_helper as l; print ' '.join(map(str, l.pick_atom_and_velocity(os.environ['atom_file'], float(os.environ['pka_energy']), float(os.environ['pka_mass']))))"`)
+data_array=(`python -c "import os; import lammps_helper as l; print ' '.join(map(str, l.pick_atom_and_velocity(os.environ['atom_file'], float(os.environ['pka_energy']))))"`)
 
 # break out info
 pka_id=${data_array[0]}

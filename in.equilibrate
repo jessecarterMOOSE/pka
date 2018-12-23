@@ -50,6 +50,6 @@ region		shell_region intersect 2 big_sphere little_sphere
 
 group		shell_group region shell_region
 
-write_dump	shell_group custom dump/dump.shell-${Nx}.txt id type x y z
+write_dump	shell_group custom dump/dump.shell-${Nx}.txt id type mass x y z
 variable	restart_filename index restart.equilibrate-${Nx}
 write_restart	restart/${restart_filename}

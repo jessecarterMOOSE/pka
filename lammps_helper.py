@@ -36,8 +36,8 @@ def unit_vector(v):
 
 def pick_atom(df):
     id = int(df.sample().index.values)
-    x, y, z = df[['x', 'y', 'z']].loc[id].values
-    return id, x, y, z
+    m, x, y, z = df[['mass', 'x', 'y', 'z']].loc[id].values
+    return id, m, x, y, z
 
 
 def pick_atom_from_file(filename):
@@ -45,9 +45,9 @@ def pick_atom_from_file(filename):
     return pick_atom(df)
 
 
-def pick_atom_and_velocity(filename, energy, mass):
-    id, x, y, z = pick_atom_from_file(filename)
-    speed = np.sqrt(2.0*energy*1.602e-19/mass/1.66e-27)*0.01  # convert to A/ps for LAMMPS
+def pick_atom_and_velocity(filename, energy):
+    id, m, x, y, z = pick_atom_from_file(filename)
+    speed = np.sqrt(2.0*energy*1.602e-19/m/1.66e-27)*0.01  # convert m/s to A/ps for LAMMPS
     velocity_vector = -1.0*speed*unit_vector([x, y, z])  # aim back at origin
 
     return id, velocity_vector[0], velocity_vector[1], velocity_vector[2]
