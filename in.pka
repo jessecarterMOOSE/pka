@@ -1,4 +1,6 @@
-read_restart	restart/restart.equilibrate-20
+read_restart	restart/restart.equilibrate-10
+
+fix		cell_coords all store/state 0 x y z  # store original atom coords to get coords of vacancies, and interstitials to some extent
 
 pair_style	eam/fs
 pair_coeff	* * Fe_2.eam.fs Fe
@@ -7,8 +9,21 @@ reset_timestep	0
 compute		defects all voronoi/atom occupation
 compute		ke all ke/atom
 compute		max_ke all reduce max c_ke
+
 variable	vac_sites atom c_defects[1]==0
+group		vac_sites dynamic all var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
+dump		vac_dump vac_sites custom 100 dump/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3]
+dump_modify	vac_dump pad 6
+
+variable	int_sites atom c_defects[1]>1
+group		int_sites dynamic all var int_sites
+compute		num_ints all reduce sum v_int_sites
+
+variable	int_atoms atom c_defects[2]>1
+group		int_atoms dynamic all var int_atoms
+dump		int_dump int_atoms custom 100 dump/dump.ints.*.txt id x y z
+dump_modify	int_dump pad 6
 
 fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
 fix		fix_nve all nve
@@ -27,4 +42,5 @@ variable	vz index 1.0
 group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
-run 10000
+run 1000
+
