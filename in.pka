@@ -7,6 +7,7 @@ pair_coeff	* * Fe_2.eam.fs Fe
 reset_timestep	0
 
 compute		defects all voronoi/atom occupation
+
 compute		ke all ke/atom
 compute		max_ke all reduce max c_ke
 
@@ -31,7 +32,7 @@ fix		fix_nve all nve
 thermo		100
 thermo_style	custom step time dt temp press c_max_ke c_num_vacs
 
-dump		bigdump all custom 100 dump/dumpall.*.txt id x y z c_defects[1] c_defects[2] c_ke
+dump		bigdump all custom 100 dump/dump.all.*.txt id x y z c_defects[1] c_defects[2] c_ke
 dump_modify	bigdump pad 6
 
 # pka
@@ -42,5 +43,17 @@ variable	vz index 1.0
 group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
-run 1000
+variable time equal time
+variable end_time index 1.0
+print "* running until ${end_time} ps *"
 
+label loop
+variable a loop 1000
+run 1000 pre no post no
+if ${time}>${end_time} then "jump SELF break"
+next a
+jump SELF loop
+label break
+print "ALL DONE"
+
+write_restart  restart/restart.after.pka.step.*

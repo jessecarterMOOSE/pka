@@ -2,6 +2,9 @@
 
 # simple bash script to select atom and velocity and run a pka simulation
 
+# set the (minimum) end time of the simulation
+end_time=1.0  # picoseconds
+
 # set some simple parameters
 export pka_energy=1000.0  # pka energy in eV
 
@@ -25,7 +28,7 @@ echo "  y-velocity: $vy"
 echo "  z-velocity: $vz"
 
 # clean up before running
-rm -rf dump/dumpall.*
+rm -f dump/dump.all.* dump/dump.ints.* dump/dump.vacs.*
 
 # run pka simulation and use the above info
- mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz
+mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time
