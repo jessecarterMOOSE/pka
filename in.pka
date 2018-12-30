@@ -1,50 +1,68 @@
+# Simple script that takes a atom id and velocity components from the command line and
+# performs a PKA simulation. Interstitial and vacancy coordinates are also output.
+
+# read some info from command line
+variable end_time index 1.0  # how long (in ps) to run pka simulation for
+# pka info
+variable	pka_id index 1
+variable	vx index 1.0
+variable	vy index 1.0
+variable	vz index 1.0
+
+# start from equilibrated structure
 read_restart	restart/restart.equilibrate-10
 
-fix		cell_coords all store/state 0 x y z  # store original atom coords to get coords of vacancies, and interstitials to some extent
+# store original atom coords to get coords of vacancies, and interstitials to some extent
+fix		cell_coords all store/state 0 x y z
 
+# some stuff does not get stored in restart file
 pair_style	eam/fs
 pair_coeff	* * Fe_2.eam.fs Fe
 reset_timestep	0
 
+# compute voronoi occuptation
 compute		defects all voronoi/atom occupation
 
-compute		ke all ke/atom
-compute		max_ke all reduce max c_ke
-
+# count vacs and dump coords
 variable	vac_sites atom c_defects[1]==0
 group		vac_sites dynamic all var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
 dump		vac_dump vac_sites custom 100 dump/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3]
 dump_modify	vac_dump pad 6
 
-variable	int_sites atom c_defects[1]>1
-group		int_sites dynamic all var int_sites
-compute		num_ints all reduce sum v_int_sites
-
+# identify ints and dump coords, not counting them here
 variable	int_atoms atom c_defects[2]>1
 group		int_atoms dynamic all var int_atoms
 dump		int_dump int_atoms custom 100 dump/dump.ints.*.txt id x y z
 dump_modify	int_dump pad 6
 
+# cut timestep so no atoms move more than 1/100th of lattice constant in a step
 fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
+
+# perform NVE time integration
 fix		fix_nve all nve
 
+# compute kinetic energy to make sure we set velocities correctly
+compute		ke all ke/atom
+compute		max_ke all reduce max c_ke
+
+# output info
 thermo		100
 thermo_style	custom step time dt temp press c_max_ke c_num_vacs
 
-dump		bigdump all custom 100 dump/dump.all.*.txt id x y z c_defects[1] c_defects[2] c_ke
+# dump all coords every once in a while, just to check
+dump		bigdump all custom 1000 dump/dump.all.*.txt id x y z c_defects[1] c_defects[2] c_ke
 dump_modify	bigdump pad 6
 
 # pka
-variable	pka_id index 1
-variable	vx index 1.0
-variable	vy index 1.0
-variable	vz index 1.0
 group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
+# dump initial coords for reference
+write_dump     all custom dump/dump.all.end.txt id type mass x y z
+
+# run until specified time
 variable time equal time
-variable end_time index 1.0
 print "* running until ${end_time} ps *"
 
 label loop
@@ -56,4 +74,6 @@ jump SELF loop
 label break
 print "ALL DONE"
 
-write_restart  restart/restart.after.pka.step.*
+# when done, dump and write restart in case we want to pick things up again
+write_dump     all custom dump/dump.all.end.txt id type mass x y z
+write_restart  restart/restart-file
