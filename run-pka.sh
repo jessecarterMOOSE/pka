@@ -3,16 +3,16 @@
 # simple bash script to select atom and velocity and run a pka simulation
 
 # set the (minimum) end time of the simulation
-end_time=1.0  # picoseconds
+end_time=1  # picoseconds
 
-# set some simple parameters
-export pka_energy=1000.0  # pka energy in eV
+# set pka energy
+pka_energy=1  # pka energy in keV
 
 # LAMMPS dump file containing atoms to be selected to be a PKA
-export atom_file="dump/dump.shell-10.txt"
+dump_file="dump/dump.shell-10.txt"
 
 # select atom from file and velocity vector that points at the simulation box origin
-data_array=(`python -c "import os; import lammps_helper as l; print ' '.join(map(str, l.pick_atom_and_velocity(os.environ['atom_file'], float(os.environ['pka_energy']))))"`)
+data_array=(`python pick_pka.py $dump_file $pka_energy --center`)
 
 # break out info
 pka_id=${data_array[0]}

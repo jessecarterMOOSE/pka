@@ -39,27 +39,3 @@ def read_ave_time(filename):
     # keywords are on the second line
     columns = lines[1].split()[2:]  # these are the data headers
     return pd.read_csv(filename, index_col=0, skiprows=2, names=columns, delim_whitespace=True)
-
-
-def unit_vector(v):
-    return v/np.sqrt(np.sum(np.square(v)))
-
-
-def pick_atom(df):
-    id = int(df.sample().index.values)
-    m, x, y, z = df[['mass', 'x', 'y', 'z']].loc[id].values
-    return id, m, x, y, z
-
-
-def pick_atom_from_file(filename):
-    df = read_dump(filename)
-    return pick_atom(df)
-
-
-def pick_atom_and_velocity(filename, energy):
-    id, m, x, y, z = pick_atom_from_file(filename)
-    speed = np.sqrt(2.0*energy*1.602e-19/m/1.66e-27)*0.01  # convert m/s to A/ps for LAMMPS
-    velocity_vector = -1.0*speed*unit_vector([x, y, z])  # aim back at origin
-
-    return id, velocity_vector[0], velocity_vector[1], velocity_vector[2]
-
