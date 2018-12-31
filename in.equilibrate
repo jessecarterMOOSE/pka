@@ -51,8 +51,8 @@ unfix		fix_nve
 
 # define a spherical shell region and group to pick a PKA from later
 variable	shell_width equal 5.0
-variable	outer_radius equal xhi
-variable	inner_radius equal xhi-${shell_width}
+variable	outer_radius equal xhi/2.0
+variable	inner_radius equal ${outer_radius}-${shell_width}
 region		big_sphere sphere 0.0 0.0 0.0 ${outer_radius} side in units box
 region		little_sphere sphere 0.0 0.0 0.0 ${inner_radius} side out units box
 region		shell_region intersect 2 big_sphere little_sphere
