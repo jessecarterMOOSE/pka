@@ -35,6 +35,7 @@ velocity	all create ${double_T} ${seed} dist gaussian
 # output info
 thermo		100
 thermo_style	custom step time temp press
+fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file equilibration-history.txt
 
 # try to get to equilibrate at zero pressure
 print		"*** NPT equilibration ***"
