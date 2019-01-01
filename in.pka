@@ -62,7 +62,7 @@ group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
 # dump initial coords for reference
-write_dump     all custom ${dump_dir}/dump.all.end.txt id type mass x y z
+write_dump     all custom ${dump_dir}/dump.all.begin.txt id type mass x y z
 
 # write some info to file
 variable	time equal time  # is there a better way to get the time into the line
