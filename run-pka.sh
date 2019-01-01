@@ -2,17 +2,17 @@
 
 # simple bash script to select atom and velocity and run a pka simulation
 
-# set the (minimum) end time of the simulation
-end_time=1  # picoseconds
-
-# set pka energy
+# set some parameters, will attempt to look for restart file based on this information
+end_time=1  #  set the (minimum) end time of the simulation, units are picoseconds
 pka_energy=1  # pka energy in keV
+Nx=10  # (half) box size
+T=300  # temperature
 
 # LAMMPS dump file containing atoms to be selected to be a PKA
-dump_file="dump/dump.shell-10.txt"
+pka_file="pka_atoms/dump.shell-T-$T-Nx-$Nx.txt"
 
 # select atom from file and velocity vector that points at the simulation box origin
-data_array=(`python pick_pka.py $dump_file $pka_energy --center`)
+data_array=(`python pick_pka.py $pka_file $pka_energy --center`)
 
 # break out info
 pka_id=${data_array[0]}
@@ -27,8 +27,10 @@ echo "  x-velocity: $vx"
 echo "  y-velocity: $vy"
 echo "  z-velocity: $vz"
 
-# clean up before running
-rm -f dump/dump.all.* dump/dump.ints.* dump/dump.vacs.*
+# make a unique directory for this run
+dump_dir=dump/$pka_energy-keV-T-$T-Nx-$Nx
+rm -rf $dump_dir
+mkdir -p $dump_dir
 
 # run pka simulation and use the above info
-mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time
+mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v dump_dir $dump_dir

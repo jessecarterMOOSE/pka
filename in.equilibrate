@@ -35,7 +35,7 @@ velocity	all create ${double_T} ${seed} dist gaussian
 # output info
 thermo		100
 thermo_style	custom step time temp press
-fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file equilibration-history.txt
+fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file equilibration/equilibration-history-T-${T}-Nx-${Nx}.txt
 
 # try to get to equilibrate at zero pressure
 print		"*** NPT equilibration ***"
@@ -59,9 +59,9 @@ region		shell_region intersect 2 big_sphere little_sphere
 group		shell_group region shell_region
 
 # write to file
-write_dump	shell_group custom dump/dump.shell-${Nx}.txt id type mass x y z
+write_dump	shell_group custom pka_atoms/dump.shell-T-${T}-Nx-${Nx}.txt id type mass x y z
 
 # write restart and atom coords so we can restart from here
-variable	restart_filename index restart.equilibrate-${Nx}
+variable	restart_filename index restart.equilibrate-T-${T}-Nx-${Nx}
 write_restart	restart/${restart_filename}
-write_dump	all custom dump/dump.equilibrate-${Nx}.txt id type mass x y z
+write_dump	all custom equilibration/dump.equilibrate-T-${T}-Nx-${Nx}.txt id type mass x y z

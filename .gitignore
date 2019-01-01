@@ -1,7 +1,5 @@
 # lammps output
 log.lammps
-dump/*
-restart/*
 
 # pycharm and python
 .idea/*
