@@ -4,6 +4,8 @@
 # read some info from command line
 variable dump_dir index dump  # place to put dump files
 variable end_time index 1.0  # how long (in ps) to run pka simulation for
+variable Nx index 10
+variable T index 300
 # pka info
 variable	pka_id index 1
 variable	vx index 1.0
@@ -11,7 +13,7 @@ variable	vy index 1.0
 variable	vz index 1.0
 
 # start from equilibrated structure
-read_restart	restart/restart.equilibrate-T-300-Nx-10
+read_restart	restart/restart.equilibrate-T-${T}-Nx-${Nx}
 
 # store original atom coords to get coords of vacancies, and interstitials to some extent
 fix		cell_coords all store/state 0 x y z

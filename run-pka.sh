@@ -33,4 +33,4 @@ rm -rf $dump_dir
 mkdir -p $dump_dir
 
 # run pka simulation and use the above info
-mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v dump_dir $dump_dir
+mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v dump_dir $dump_dir -v Nx $Nx -v T $T
