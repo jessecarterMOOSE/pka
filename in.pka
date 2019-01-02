@@ -61,6 +61,9 @@ dump_modify	bigdump pad 6
 group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
+# initialize system
+run 0 post no
+
 # dump initial coords for reference
 write_dump     all custom ${dump_dir}/dump.all.begin.txt id type mass x y z
 
