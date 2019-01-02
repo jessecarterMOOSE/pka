@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 
 
 def read_file(filename):
@@ -32,6 +31,23 @@ def read_dump(filename, return_header=False):
         return df, info
 
     return df
+
+
+def write_dump(filename, info_dict, df):
+    with open(filename, 'w') as f:
+        # write header
+        f.write('ITEM: TIMESTEP'+'\n')
+        f.write(str(info_dict['timestep'])+'\n')
+        f.write('ITEM: NUMBER OF ATOMS'+'\n')
+        f.write(str(info_dict['number of atoms'])+'\n')
+        f.write('ITEM: BOX BOUNDS pp pp pp'+'\n')  # TODO: read boundary conditions
+        f.write('{:f} {:f}'.format(info_dict['xlo'], info_dict['xhi'])+'\n')
+        f.write('{:f} {:f}'.format(info_dict['ylo'], info_dict['yhi'])+'\n')
+        f.write('{:f} {:f}'.format(info_dict['zlo'], info_dict['zhi'])+'\n')
+        f.write('ITEM: ATOMS id '+' '.join(df.columns.tolist())+'\n')
+
+    # now write the rest of the data
+    df.to_csv(filename, sep=' ', header=False, mode='a')
 
 
 def read_ave_time(filename):
