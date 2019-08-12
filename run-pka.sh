@@ -34,3 +34,12 @@ mkdir -p $dump_dir
 
 # run pka simulation and use the above info
 mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v dump_dir $dump_dir -v Nx $Nx -v T $T
+
+# combine separate int/vac dumps into a single
+for file in $dump_dir/dump.ints.*.txt
+do
+  echo "processing $file..."
+  vac_file=`echo $file | sed 's/ints/vacs/'`
+  out_file=`echo $file | sed 's/ints/defects/'`
+  python combine_defect_files.py $file $vac_file $out_file
+done
