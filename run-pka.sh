@@ -28,9 +28,11 @@ echo "  y-velocity: $vy"
 echo "  z-velocity: $vz"
 
 # make a unique directory for this run
-dump_dir=dump/$pka_energy-keV-T-$T-Nx-$Nx
+run_number=`python get_run_number.py $pka_energy $T $Nx`
+dump_dir=dump/$pka_energy-keV-T-$T-Nx-$Nx/run-$run_number
 rm -rf $dump_dir
 mkdir -p $dump_dir
+echo "writing output to $dump_dir..."
 
 # run pka simulation and use the above info
 mpiexec -np 4 ./lammps -in in.pka -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v dump_dir $dump_dir -v Nx $Nx -v T $T
