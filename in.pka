@@ -61,10 +61,6 @@ compute		max_ke all reduce max c_ke
 thermo		100
 thermo_style	custom step time dt temp press c_max_ke c_num_vacs
 
-# dump all coords every once in a while, just to check
-dump		bigdump all custom 1000 all/dump.all.*.txt id x y z c_defects[1] c_defects[2] c_ke
-dump_modify	bigdump pad 6
-
 # pka
 group		pka id ${pka_id}
 velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
