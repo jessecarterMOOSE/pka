@@ -5,6 +5,9 @@ import numpy as np
 # Inputs: LAMMPS dump file, kinetic energy in keV, and an optional argument '--center' that points the velocity at the box origin.
 # Otherwise, the direction is chosen at random.
 
+def set_seed(seed):
+    np.random.seed(seed)
+
 
 def unit_vector(v):
     return v/np.sqrt(np.sum(np.square(v)))
@@ -40,8 +43,12 @@ if __name__ == '__main__':
     parser.add_argument('dump_file', help='name of dump file to pick an atom from')
     parser.add_argument('energy', help='kinetic energy of pka in keV')
     parser.add_argument('--center', action='store_true', help='point velocity at box origin')
+    parser.add_argument('--seed', type=int, help='seed for the random number generator')
 
     args = parser.parse_args()
+
+    if args.seed:
+        set_seed(args.seed)
 
     id, vx, vy, vz = pick_atom_and_velocity(args.dump_file, float(args.energy)*1000.0, args.center)
 
