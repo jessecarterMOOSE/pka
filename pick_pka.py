@@ -11,7 +11,7 @@ def unit_vector(v):
 
 
 def pick_atom(df):
-    id = int(df.sample().index.values)
+    id = np.random.choice(df.index.values)
     m, x, y, z = df[['mass', 'x', 'y', 'z']].loc[id].values
     return id, m, x, y, z
 
