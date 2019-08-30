@@ -47,6 +47,15 @@ compute		int_cluster_id all chunk/atom c_int_cluster compress yes
 dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z c_int_cluster_id
 dump_modify	int_dump pad 6
 
+# check for wrapped atoms
+compute int_image int_atoms property/atom ix iy iz
+compute vac_image vac_sites property/atom ix iy iz
+variable int_image_sumsq atom c_int_image[1]*c_int_image[1]+c_int_image[2]*c_int_image[2]+c_int_image[3]*c_int_image[3]
+variable vac_image_sumsq atom c_vac_image[1]*c_vac_image[1]+c_vac_image[2]*c_vac_image[2]+c_vac_image[3]*c_vac_image[3]
+compute total_int_image_sum int_atoms reduce sum v_int_image_sumsq
+compute total_vac_image_sum vac_sites reduce sum v_vac_image_sumsq
+variable wrap_flag equal c_total_int_image_sum+c_total_vac_image_sum
+
 # cut timestep so no atoms move more than 1/100th of lattice constant in a step
 fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
 
@@ -59,7 +68,7 @@ compute		max_ke all reduce max c_ke
 
 # output info
 thermo		100
-thermo_style	custom step time dt temp press c_max_ke c_num_vacs
+thermo_style	custom step time dt temp press v_wrap_flag c_max_ke c_num_vacs
 
 # pka
 group		pka id ${pka_id}
@@ -73,7 +82,7 @@ write_dump     all custom all/dump.all.begin.txt id type mass x y z
 
 # write some info to file
 variable	time equal time  # is there a better way to get the time into the line
-fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke file time-history.txt
+fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag file time-history.txt
 
 # run until specified time
 variable time equal time
