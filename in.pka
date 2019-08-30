@@ -56,6 +56,11 @@ compute total_int_image_sum int_atoms reduce sum v_int_image_sumsq
 compute total_vac_image_sum vac_sites reduce sum v_vac_image_sumsq
 variable wrap_flag equal c_total_int_image_sum+c_total_vac_image_sum
 
+# find minimum separation distance between any and all atoms
+compute propertylocal all property/local patom1 patom2
+compute pairlocal all pair/local dist eng force
+compute min_d all reduce min c_pairlocal[1]
+
 # cut timestep so no atoms move more than 1/100th of lattice constant in a step
 fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
 
@@ -68,7 +73,7 @@ compute		max_ke all reduce max c_ke
 
 # output info
 thermo		100
-thermo_style	custom step time dt temp press v_wrap_flag c_max_ke c_num_vacs
+thermo_style	custom step time dt temp press v_wrap_flag c_min_d c_max_ke c_num_vacs
 
 # pka
 group		pka id ${pka_id}
@@ -82,7 +87,7 @@ write_dump     all custom all/dump.all.begin.txt id type mass x y z
 
 # write some info to file
 variable	time equal time  # is there a better way to get the time into the line
-fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag file time-history.txt
+fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag c_min_d file time-history.txt
 
 # run until specified time
 variable time equal time
