@@ -89,6 +89,9 @@ write_dump     all custom all/dump.all.begin.txt id type mass x y z
 variable	time equal time  # is there a better way to get the time into the line
 fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag c_min_d file time-history.txt
 
+# stop the drift drift every once in a while
+fix momentum all momentum 100 linear 1 1 1
+
 # run until specified time
 variable time equal time
 print "* running until ${end_time} ps *"
