@@ -20,7 +20,7 @@ create_atoms	1 box
 
 # use this pair potential
 pair_style	eam/fs
-pair_coeff	* * Fe_2.eam.fs Fe
+pair_coeff	* * potentials/Fe_2.eam.fs Fe
 
 # minimize the box
 fix		box_relax all box/relax iso 0.0
@@ -39,7 +39,7 @@ fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file equilibration
 
 # try to get to equilibrate at zero pressure
 print		"*** NPT equilibration ***"
-fix		fix_npt all npt temp ${T} ${T} $(100.0*dt) iso 0.0 0.0 $(100.0*dt) drag 1.0
+fix		fix_npt all npt temp ${T} ${T} $(100.0*dt) iso 0.0 0.0 $(1000.0*dt) drag 1.0
 run		5000
 unfix		fix_npt
 
