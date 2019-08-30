@@ -36,7 +36,7 @@ group		vac_sites dynamic all var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
 compute		vac_cluster vac_sites cluster/atom ${vac_cluster_cutoff}
 compute		vac_cluster_id all chunk/atom c_vac_cluster compress yes
-dump		vac_dump vac_sites custom 100 defects/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3] c_vac_cluster_id
+dump		vac_dump vac_sites custom 100 vacs/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3] c_vac_cluster_id
 dump_modify	vac_dump pad 6
 
 # identify ints and clusters, dump coords, not counting them here
@@ -44,7 +44,7 @@ variable	int_atoms atom c_defects[2]>1
 group		int_atoms dynamic all var int_atoms
 compute		int_cluster int_atoms cluster/atom ${int_cluster_cutoff}
 compute		int_cluster_id all chunk/atom c_int_cluster compress yes
-dump		int_dump int_atoms custom 100 defects/dump.ints.*.txt id x y z c_int_cluster_id
+dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z c_int_cluster_id
 dump_modify	int_dump pad 6
 
 # cut timestep so no atoms move more than 1/100th of lattice constant in a step

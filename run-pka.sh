@@ -3,7 +3,7 @@
 # simple bash script to select atom and velocity and run a pka simulation
 
 # set some parameters, will attempt to look for restart file based on this information
-end_time=1  #  set the (minimum) end time of the simulation, units are picoseconds
+end_time=0.1  #  set the (minimum) end time of the simulation, units are picoseconds
 pka_energy=1  # pka energy in keV
 Nx=10  # (half) box size
 T=300  # temperature
@@ -39,7 +39,7 @@ pka_dir=$PWD
 cd $dump_dir
 
 # make some more output directories for different dumps
-mkdir all defects combined_defects clusters
+mkdir all ints vacs defects clusters
 
 # run pka simulation and use the above info
 mpiexec -np 4 $pka_dir/lammps -in $pka_dir/in.pka \
@@ -47,12 +47,5 @@ mpiexec -np 4 $pka_dir/lammps -in $pka_dir/in.pka \
   -v restart_dir $pka_dir/restart -v potential_dir $pka_dir/potentials
 
 # combine separate int/vac dumps into a single
-cd defects
-for file in dump.ints.*.txt
-do
-  echo "processing $file..."
-  vac_file=`echo $file | sed 's/ints/vacs/'`
-  out_file=`echo $file | sed 's/ints/defects/'`
-  python $pka_dir/combine_defect_files.py $file $vac_file ../combined_defects/$out_file
-done
+python $pka_dir/combine_defect_files.py .
 
