@@ -9,6 +9,7 @@ variable int_cluster_cutoff index 3.2
 variable vac_cluster_cutoff index 3.2
 variable restart_dir index restart
 variable potential_dir index potentials
+variable thermostat_edge index 0
 
 # pka info
 variable	pka_id index 1
@@ -60,6 +61,19 @@ variable wrap_flag equal c_total_int_image_sum+c_total_vac_image_sum
 compute propertylocal all property/local patom1 patom2
 compute pairlocal all pair/local dist eng force
 compute min_d all reduce min c_pairlocal[1]
+
+# define outer region of box to possibly thermostat
+variable edge equal 5.0
+variable xleft equal xlo+${edge}
+variable xright equal xhi-${edge}
+variable yleft equal ylo+${edge}
+variable yright equal yhi-${edge}
+variable zleft equal zlo+${edge}
+variable zright equal zhi-${edge}
+region outer_edge block ${xleft} ${xright} ${yleft} ${yright} ${zleft} ${zright} units box side out
+group outer_atoms region outer_edge
+compute outer_temp outer_atoms temp
+if "${thermostat_edge}==1" then "fix nvt_edge outer_atoms nvt temp $T $T $(100.0*dt)"
 
 # cut timestep so no atoms move more than 1/100th of lattice constant in a step
 fix		fix_dt all dt/reset 1 NULL 0.001 0.01 units lattice
