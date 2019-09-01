@@ -36,7 +36,7 @@ variable	vac_sites atom c_defects[1]==0
 group		vac_sites dynamic all var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
 compute		vac_cluster vac_sites cluster/atom ${vac_cluster_cutoff}
-compute		vac_cluster_id all chunk/atom c_vac_cluster compress yes
+compute		vac_cluster_id vac_sites chunk/atom c_vac_cluster compress yes
 dump		vac_dump vac_sites custom 100 vacs/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3] c_vac_cluster_id
 dump_modify	vac_dump pad 6
 
@@ -44,7 +44,7 @@ dump_modify	vac_dump pad 6
 variable	int_atoms atom c_defects[2]>1
 group		int_atoms dynamic all var int_atoms
 compute		int_cluster int_atoms cluster/atom ${int_cluster_cutoff}
-compute		int_cluster_id all chunk/atom c_int_cluster compress yes
+compute		int_cluster_id int_atoms chunk/atom c_int_cluster compress yes
 dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z c_int_cluster_id
 dump_modify	int_dump pad 6
 
@@ -120,5 +120,5 @@ label break
 print "ALL DONE"
 
 # when done, dump and write restart in case we want to pick things up again
-write_dump     all custom all/dump.all.end.txt id type mass x y z
+write_dump     all custom all/dump.all.end.txt id type mass x y z c_vac_cluster_id c_int_cluster_id
 write_restart  restart-file
