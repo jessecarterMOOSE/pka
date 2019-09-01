@@ -87,11 +87,14 @@ compute		max_ke all reduce max c_ke
 
 # output info
 thermo		100
-thermo_style	custom step time dt temp press v_wrap_flag c_min_d c_max_ke c_num_vacs
+thermo_style	custom step time dt temp c_outer_temp press v_wrap_flag c_min_d c_max_ke c_num_vacs
 
-# pka
-group		pka id ${pka_id}
-velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
+# write some info to file
+variable	time equal time  # is there a better way to get the time into the line
+fix		output all ave/time 1 1 100 v_time c_thermo_temp c_outer_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag c_min_d file time-history.txt
+
+# stop the drift drift every once in a while
+fix momentum all momentum 100 linear 1 1 1
 
 # initialize system
 run 0 post no
@@ -99,12 +102,9 @@ run 0 post no
 # dump initial coords for reference
 write_dump     all custom all/dump.all.begin.txt id type mass x y z
 
-# write some info to file
-variable	time equal time  # is there a better way to get the time into the line
-fix		output all ave/time 1 5 100 v_time c_thermo_temp c_thermo_press c_num_vacs c_max_ke v_wrap_flag c_min_d file time-history.txt
-
-# stop the drift drift every once in a while
-fix momentum all momentum 100 linear 1 1 1
+# pka
+group		pka id ${pka_id}
+velocity	pka set ${vx} ${vy} ${vz} units box  # 587 A/ps is about 1 keV for Fe
 
 # run until specified time
 variable time equal time
