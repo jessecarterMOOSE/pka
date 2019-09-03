@@ -10,6 +10,8 @@ variable vac_cluster_cutoff index 3.2
 variable restart_dir index restart
 variable potential_dir index potentials
 variable thermostat_edge index 0
+variable electronic_stopping index 0
+variable electronic_stopping_file index None
 
 # pka info
 variable	pka_id index 1
@@ -95,6 +97,10 @@ fix		output all ave/time 1 1 100 v_time c_thermo_temp c_outer_temp c_thermo_pres
 
 # stop the drift drift every once in a while
 fix momentum all momentum 100 linear 1 1 1
+
+# optionally apply electronic stopping power
+region all block INF INF INF INF INF INF
+if "${electronic_stopping} == 1" then "fix elstopping all electron/stopping 10.0 ${electronic_stopping_file} region all"
 
 # initialize system
 run 0 post no

@@ -8,6 +8,8 @@ pka_energy=1  # pka energy in keV
 Nx=10  # (half) box size
 T=300  # temperature
 thermostat_edge=0  # apply thermostat to outer edges of box
+electronic_stopping=0  # apply electronic stopping, using file below
+electronic_stopping_file='IronInIron.txt'  # should be in the electronic_stopping_files/ directory
 
 # LAMMPS dump file containing atoms to be selected to be a PKA
 pka_file="pka_atoms/dump.shell-T-$T-Nx-$Nx.txt"
@@ -45,7 +47,8 @@ mkdir all ints vacs defects clusters
 # run pka simulation and use the above info
 mpiexec -np 4 $pka_dir/lammps -in $pka_dir/in.pka \
   -v pka_id $pka_id -v vx $vx -v vy $vy -v vz $vz -v end_time $end_time -v Nx $Nx -v T $T \
-  -v restart_dir $pka_dir/restart -v potential_dir $pka_dir/potentials -v thermostat_edge $thermostat_edge
+  -v restart_dir $pka_dir/restart -v potential_dir $pka_dir/potentials -v thermostat_edge $thermostat_edge \
+  -v electronic_stopping $electronic_stopping -v electronic_stopping_file $pka_dir/electronic_stopping_files/$electronic_stopping_file
 
 # combine separate int/vac dumps into a single
 python $pka_dir/combine_defect_files.py .
