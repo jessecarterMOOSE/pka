@@ -35,7 +35,7 @@ compute		defects all voronoi/atom occupation
 
 # count vacs and clusters, dump coords
 variable	vac_sites atom c_defects[1]==0
-group		vac_sites dynamic all var vac_sites
+group		vac_sites dynamic all every 100 var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
 compute		vac_cluster vac_sites cluster/atom ${vac_cluster_cutoff}
 compute		vac_cluster_id vac_sites chunk/atom c_vac_cluster compress yes
@@ -44,7 +44,7 @@ dump_modify	vac_dump pad 6
 
 # identify ints and clusters, dump coords, not counting them here
 variable	int_atoms atom c_defects[2]>1
-group		int_atoms dynamic all var int_atoms
+group		int_atoms dynamic all every 100 var int_atoms
 compute		int_cluster int_atoms cluster/atom ${int_cluster_cutoff}
 compute		int_cluster_id int_atoms chunk/atom c_int_cluster compress yes
 dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z c_int_cluster_id
