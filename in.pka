@@ -5,8 +5,6 @@
 variable end_time index 1.0  # how long (in ps) to run pka simulation for
 variable Nx index 10
 variable T index 300
-variable int_cluster_cutoff index 3.2
-variable vac_cluster_cutoff index 3.2
 variable restart_dir index restart
 variable potential_dir index potentials
 variable thermostat_edge index 0
@@ -30,24 +28,20 @@ pair_style	eam/fs
 pair_coeff	* * ${potential_dir}/Fe_2.eam.fs Fe
 reset_timestep	0
 
-# compute voronoi occuptation
+# compute voronoi occupation
 compute		defects all voronoi/atom occupation
 
-# count vacs and clusters, dump coords
+# identify and count vacs, dump coords
 variable	vac_sites atom c_defects[1]==0
 group		vac_sites dynamic all every 100 var vac_sites
 compute		num_vacs all reduce sum v_vac_sites
-compute		vac_cluster vac_sites cluster/atom ${vac_cluster_cutoff}
-compute		vac_cluster_id vac_sites chunk/atom c_vac_cluster compress yes
-dump		vac_dump vac_sites custom 100 vacs/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3] c_vac_cluster_id
+dump		vac_dump vac_sites custom 100 vacs/dump.vacs.*.txt id f_cell_coords[1] f_cell_coords[2] f_cell_coords[3]
 dump_modify	vac_dump pad 6
 
-# identify ints and clusters, dump coords, not counting them here
+# identify ints and dump coords, not counting them here
 variable	int_atoms atom c_defects[2]>1
 group		int_atoms dynamic all every 100 var int_atoms
-compute		int_cluster int_atoms cluster/atom ${int_cluster_cutoff}
-compute		int_cluster_id int_atoms chunk/atom c_int_cluster compress yes
-dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z c_int_cluster_id
+dump		int_dump int_atoms custom 100 ints/dump.ints.*.txt id x y z
 dump_modify	int_dump pad 6
 
 # check for wrapped atoms
@@ -126,5 +120,5 @@ label break
 print "ALL DONE"
 
 # when done, dump and write restart in case we want to pick things up again
-write_dump     all custom all/dump.all.end.txt id type mass x y z c_vac_cluster_id c_int_cluster_id
+write_dump     all custom all/dump.all.end.txt id type mass x y z
 write_restart  restart-file

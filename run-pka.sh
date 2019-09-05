@@ -42,7 +42,7 @@ pka_dir=$PWD
 cd $dump_dir
 
 # make some more output directories for different dumps
-mkdir all ints vacs defects clusters
+mkdir all ints vacs defects
 
 # run pka simulation and use the above info
 mpiexec -np 4 $pka_dir/lammps -in $pka_dir/in.pka \
