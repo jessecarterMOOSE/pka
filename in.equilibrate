@@ -22,6 +22,13 @@ create_atoms	1 box
 pair_style	eam/fs
 pair_coeff	* * potentials/Fe_2.eam.fs Fe
 
+# get ready to output
+variable	boxstring string "Nx-${Nx}-T-$T"
+variable	outdir string "outputs/${boxstring}/equilibrate"
+shell		mkdir outputs  # intermediate because 'mkdir -p' doesn't work
+shell		mkdir outputs/${boxstring}  # intermediate because 'mkdir -p' doesn't work
+shell		mkdir ${outdir}
+
 # minimize the box
 fix		box_relax all box/relax iso 0.0
 minimize	1.0e-10 1.0e-10 1000 1000
@@ -35,7 +42,7 @@ velocity	all create ${double_T} ${seed} dist gaussian
 # output info
 thermo		100
 thermo_style	custom step time temp press
-fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file equilibration/equilibration-history-T-${T}-Nx-${Nx}.txt
+fix		output all ave/time 1 5 100 c_thermo_temp c_thermo_press file ${outdir}/time-history.txt
 
 # try to get to equilibrate at zero pressure
 print		"*** NPT equilibration ***"
@@ -59,9 +66,8 @@ region		shell_region intersect 2 big_sphere little_sphere
 group		shell_group region shell_region
 
 # write to file
-write_dump	shell_group custom pka_atoms/dump.shell-T-${T}-Nx-${Nx}.txt id type mass x y z
+write_dump	shell_group custom ${outdir}/dump.shell.txt id type mass x y z
 
 # write restart and atom coords so we can restart from here
-variable	restart_filename index restart.equilibrate-T-${T}-Nx-${Nx}
-write_restart	restart/${restart_filename}
-write_dump	all custom equilibration/dump.equilibrate-T-${T}-Nx-${Nx}.txt id type mass x y z
+write_restart	${outdir}/restart
+write_dump	all custom ${outdir}/dump.end.txt id type mass x y z
