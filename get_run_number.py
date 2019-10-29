@@ -19,7 +19,7 @@ padding = 3
 
 # helper function to take variables and make a path
 def get_dirname(keV, T, Nx, run=None):
-    mypath = os.path.join('dump', '{}-keV-T-{}-Nx-{}'.format(keV, T, Nx))
+    mypath = os.path.join('outputs', 'Nx-{}-T-{}'.format(Nx, T), 'pka', '{}-keV'.format(keV))
     if run:
         mypath = os.path.join(mypath, 'run-{}'.format(str(run).zfill(padding)))
     return mypath
